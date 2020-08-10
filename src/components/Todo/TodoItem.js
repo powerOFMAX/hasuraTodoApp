@@ -5,10 +5,19 @@ const TodoItem = ({index, todo}) => {
   const removeTodo = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    todo.remove()
   };
 
   const toggleTodo = () => {
+    delete todo._data["_deleted"]
+    delete todo._data["_revisions"]
 
+    todo.update({
+      $set: {
+        isCompleted: !todo.isCompleted,
+      }
+    })
   };
 
   return (

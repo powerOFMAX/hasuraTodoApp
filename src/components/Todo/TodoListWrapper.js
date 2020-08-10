@@ -8,17 +8,18 @@ class TodoListWrapper extends Component {
   state = {
     todos: []
   }
+  rxSubs = []
 
-  componentDidMount() {
-    if (this.props.db && this.props.db.todos) {
-      this.props.db.todos.find()
-        .sort('createdAt').$.subscribe(todos => {
-          if (!todos) {
-            return;
-          }
-          this.setState({ todos });
-        });
-    }
+  async componentDidMount() {
+    const sub = this.props.db.todos.find()
+      .sort('createdAt').$.subscribe(todos => {
+        if (!todos) {
+          return;
+        }
+
+        this.setState({ todos });
+      });
+    this.rxSubs.push(sub);
   }
 
   render() {
