@@ -78,6 +78,7 @@ export default class AppWrapper extends React.Component {
       idToken: authResult.idToken,
       userId: this.userId,
     });
+    this.graphqlReplicator.restart({ userId: this.userId, idToken: this.idToken });
   }
 
   renewSession() {
@@ -128,6 +129,7 @@ export default class AppWrapper extends React.Component {
   async componentDidMount() {
     const db = await Database.createDb()
     this.setState({ db });
+    this.graphqlReplicator = new Database.GraphQLReplicator(db);
     // If this is a callback URL then do the right things
     const location = this.props.location;
     if (location && location.pathname.startsWith('/callback') && /access_token|id_token|error/.test(location.hash)) {

@@ -1,68 +1,79 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# RxDB / GraphQL / Auth0 / Hasura Todo App
+This project follows the app sample provided by Hasura.io. This is a Todo app Offline First. This means that it's an app which is unaffected by intermittent lack of a network connection
 
-## Available Scripts
+![imagen](https://i.imgur.com/wz8Uv21.jpg)
 
-In the project directory, you can run:
+## Things to know:
+Before setting up this project we will need to:
 
-### `yarn start`
+- Deploy Hasura on Hasura Cloud
+- Setup the database schema
+- Integrate with Authentication provider Auth0
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Hasura Cloud will take care of the GraphQL infrastructure and hence we don't need to worry about the Ops portion of this app.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
 
-### `yarn test`
+## Requirements
+This app was built using create-react-app so the requirements are the same.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node >= 8.10
 
-### `yarn build`
+# How to set up the project
+## 1) Deploy Hasura
+To do that go to: https://cloud.hasura.io/ and click on "Try a free database with Heroku" and Create a project.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Hasura Cloud will:
+- Create an app on Heroku
+- Install Postgres Add-on
+- Fetch database URL that you can use to configure Hasura
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## 2) Setup Database
+Open the Hasura console and create the tables.
+```
+# The users table will contain two fields
+Users
+- auth0_id: text primary key unique
+- name: text
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# The todos table will contain the following fields
+Todos
+- id: text primary key unique
+- userId: text
+- text: text
+- isCompleted: boolean
+- deleted: boolean; default: false
+- createdAt: timestamp with timezone, default: now()
+- updatedAt: timestamp with time zone, default: now()
+```
 
-### `yarn eject`
+### Set Permissions
+A user should be able to create, select, update and delete only todos belonging to him. This can be enforced by setting permissions like this:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```{"userId": {"_eq": "X-Hasura-User-Id"}}```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 3) Integrate with Authentication provider Auth0
+You can follow this tutorial: https://hasura.io/learn/graphql/hasura/authentication/1-create-auth0-app/ 
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+The rules you need to configure in Auth0 are under src/utils folder. You have to follow that tutorial and replace it with your Auth0 credentials.
 
-## Learn More
+## 4) Setup this project in your local
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The basic steps are:
+- Open the folder
+- Copy env-example and change global variables
+    - Run ```cp .env.example .env ``` and make the changes you want.
+- Run ```npm install``` or  ``` yarn install ```
+- Run ```npm start``` or ``` yarn start ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Once its done you should be able to see the project up and running on ```http://localhost:3000/```
 
-### Code Splitting
+*Note: If you want to test the mobile first functionality you must build this project. To test it you can do the following:*
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+- Run ```yarn build``` to build a productive version of the project.
+- Then you can use the following to install a static server ```yarn global add serve```
+- Once is installed execute ```serve -s build```
 
-### Analyzing the Bundle Size
+You should be able to see the project up and running on ```http://localhost:5000/```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
 
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
